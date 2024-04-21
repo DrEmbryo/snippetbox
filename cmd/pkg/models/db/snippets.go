@@ -16,12 +16,7 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	
 	createdAt := time.Now().UTC();
 	
-	expiresAt, err := time.Parse(time.RFC3339, expires)
-	if err != nil {
-		return 0, err
-	}
-	
-	result, err := m.DB.Exec(stmt, title, content, createdAt, expiresAt)
+	result, err := m.DB.Exec(stmt, title, content, createdAt.String(), expires)
 	if err != nil{
 		return 0, err
 	}
