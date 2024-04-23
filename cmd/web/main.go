@@ -7,14 +7,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/DrEmbryo/snippetbox/cmd/pkg/models/db"
+	"github.com/golangcollege/sessions"
 	_ "modernc.org/sqlite"
 )
 
 type application struct {
 	errorLog *log.Logger
 	infoLog *log.Logger
+	session *sessions.Session
 	snippets *db.SnippetModel
 	templateCache map[string]*template.Template
 }
@@ -39,9 +42,14 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	secret := flag.String("secret","s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "secret")
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
+
 	app := &application{
 		errorLog: errorLog,
 		infoLog: infoLog,
+		session: session,
 		snippets: &db.SnippetModel{DB: database},
 		templateCache: templateCache,
 	}
