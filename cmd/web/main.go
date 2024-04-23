@@ -60,7 +60,7 @@ func main() {
 		Handler: app.routes(),
 	}
 	infoLog.Printf("listening on port %s", *addr)
-	err = server.ListenAndServe()
+	err = server.ListenAndServeTLS("./cmd/tls/cert.pem", "./cmd/tls/key.pem")
 	errorLog.Fatal(err)
 }
 
