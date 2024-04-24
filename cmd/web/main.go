@@ -21,6 +21,7 @@ type application struct {
 	session *sessions.Session
 	snippets *db.SnippetModel
 	templateCache map[string]*template.Template
+	users *db.UserModel
 }
 
 func main() {
@@ -53,6 +54,7 @@ func main() {
 		session: session,
 		snippets: &db.SnippetModel{DB: database},
 		templateCache: templateCache,
+		users: &db.UserModel{DB: database},
 	}
 
 	tlsConfig := &tls.Config{
