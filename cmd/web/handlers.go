@@ -84,13 +84,42 @@ func (app *application) createSnippetForm (w http.ResponseWriter, r *http.Reques
 }
 
 func (app *application) signupUserForm(w http.ResponseWriter, r *http.Request) {
-fmt.Fprintln(w, "Display the user signup form...")
+	app.render(w, r, "signup.page.tmpl", &templateData{
+		Form: forms.New(nil),
+	})
 }
 func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
-fmt.Fprintln(w, "Create a new user...")
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return 
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("name", "email", "password")
+	form.MatchesPattern("email", forms.EmailRX)
+	form.MinLength("password", 10)
+	if !form.Valid() {
+		app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
+	}
+
+	name := form.Get("name")
+	email := form.Get("email")
+	password := form.Get("password")
+
+	_, err = app.users.Insert(name, email, password)
+	if err != nil {
+		app.serverError(w, err)
+		return	
+	}
+
+	app.session.Put(r, "flash", "Your signup was successful. Please log in.")
+	
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
+
 func (app *application) loginUserForm(w http.ResponseWriter, r *http.Request) {
-fmt.Fprintln(w, "Display the user login form...")
+  fmt.Fprintln(w, "Display the user login form...")
 }
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 fmt.Fprintln(w, "Authenticate and login the user...")

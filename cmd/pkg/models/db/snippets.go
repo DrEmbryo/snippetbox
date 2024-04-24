@@ -14,9 +14,9 @@ type SnippetModel struct {
 func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	stmt := `INSERT INTO snippets (title, content, created, expires) VALUES(?, ?, ?, ?)`
 	
-	createdAt := time.Now().UTC();
+	createdAt := time.Now().UTC().String();
 	
-	result, err := m.DB.Exec(stmt, title, content, createdAt.String(), expires)
+	result, err := m.DB.Exec(stmt, title, content, createdAt, expires)
 	if err != nil{
 		return 0, err
 	}
