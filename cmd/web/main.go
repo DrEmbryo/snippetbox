@@ -12,6 +12,7 @@ import (
 
 	"github.com/DrEmbryo/snippetbox/cmd/pkg/models/db"
 	"github.com/golangcollege/sessions"
+	"github.com/justinas/nosurf"
 	_ "modernc.org/sqlite"
 )
 
@@ -47,6 +48,8 @@ func main() {
 	secret := flag.String("secret","s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "secret")
 	session := sessions.New([]byte(*secret))
 	session.Lifetime = 12 * time.Hour
+	session.Secure = true
+	session.SameSite = http.SameSiteStrictMode
 
 	app := &application{
 		errorLog: errorLog,
@@ -87,3 +90,13 @@ func openDB() (*sql.DB, error) {
 	}
 	return db, nil
 }
+
+func noSurf(next http.Handler) http.Handler {
+	csrfHandler := nosurf.New(next)
+	csrfHandler.SetBaseCookie(http.Cookie{
+	HttpOnly: true,
+	Path: "/",
+	Secure: true,
+	})
+	return csrfHandler
+	}
